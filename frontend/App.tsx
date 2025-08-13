@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   },
   header: {
     justifyContent: 'flex-start',
-    paddingTop: 60,
+    paddingTop: 70,
     paddingHorizontal: 20,
   },
   greeting: {
@@ -83,7 +83,8 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     justifyContent: 'flex-start',
-    backgroundColor: 'rgba(239, 242, 239, 0.7)',
+    backgroundColor: 'rgba(239, 242, 239, 1)',
+    borderRadius: 20
   },
   searchContainer: {
     flexDirection: 'row',
@@ -114,7 +115,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
-    backgroundColor: 'rgba(239, 242, 239, 1)',
+    backgroundColor: 'rgba(199, 171, 218, 1)',
     borderRadius: 10,
     padding: 15,
     shadowColor: 'rgba(35, 33, 66, 1)',
