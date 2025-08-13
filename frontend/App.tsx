@@ -1,13 +1,22 @@
-import React, { useRef } from 'react'
-import { StyleSheet, Text, View, ImageBackground, TextInput, Animated } from 'react-native'
+import React, { useRef, useState, useEffect } from 'react'
+import { StyleSheet, Text, View, ImageBackground, TextInput, Animated, ActivityIndicator } from 'react-native'
 import Ionicons from '@expo/vector-icons/Ionicons'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const HEADER_MAX_HEIGHT = 400
 const HEADER_MIN_HEIGHT = 200
 const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT
+const BACKEND_URL = 'http://localhost:3001/api/pokemon'
+
+type Pokemon = {
+  name: string
+  url: string
+}
 
 export default function App() {
   const scrollY = useRef(new Animated.Value(0)).current
+  const [pokemonList, setPokemonList] = useState<Pokemon[]>([])
+  const [loading, setLoading] = useState(true)
 
   const headerHeight = scrollY.interpolate({
     inputRange: [0, HEADER_SCROLL_DISTANCE],
@@ -20,6 +29,44 @@ export default function App() {
     outputRange: [1, 0.5, 0],
     extrapolate: 'clamp',
   })
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const storedData = await AsyncStorage.getItem('pokemonList')
+
+        if (storedData) {
+          console.log('Loaded from AsyncStorage')
+          setPokemonList(JSON.parse(storedData))
+          setLoading(false)
+
+        } else {
+          console.log('Fetching from backend…')
+          const response = await fetch(BACKEND_URL)
+          const data = await response.json()
+
+          await AsyncStorage.setItem('pokemonList', JSON.stringify(data))
+
+          setPokemonList(data)
+          setLoading(false)
+        }
+      } catch (error) {
+        console.error('Error loading Pokémon:', error)
+        setLoading(false)
+      }
+    }
+
+    loadData()
+  }, [])
+
+  if (loading) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" />
+        <Text>Loading Pokémon data...</Text>
+      </View>
+    )
+  }
 
   return (
     <ImageBackground
@@ -51,9 +98,9 @@ export default function App() {
             { useNativeDriver: false }
           )}
         >
-          {Array.from({ length: 20 }).map((_, i) => (
-            <View key={i} style={styles.listItem}>
-              <Text>Pokémon #{i + 1}</Text>
+          {pokemonList.map((pokemon, index) => (
+            <View key={index} style={styles.listItem}>
+              <Text>{pokemon.name}</Text>
             </View>
           ))}
         </Animated.ScrollView>
@@ -63,6 +110,11 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   background: {
     flex: 1,
     width: '100%',
