@@ -1,10 +1,9 @@
 import React, { useRef } from 'react'
 import { StyleSheet, Text, View, ImageBackground, TextInput, Animated } from 'react-native'
 import Ionicons from '@expo/vector-icons/Ionicons'
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
-const HEADER_MAX_HEIGHT = 350
-const HEADER_MIN_HEIGHT = 100
+const HEADER_MAX_HEIGHT = 400
+const HEADER_MIN_HEIGHT = 200
 const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT
 
 export default function App() {
@@ -23,47 +22,43 @@ export default function App() {
   })
 
   return (
-    <SafeAreaProvider>
-      <ImageBackground
-        source={require('./assets/background-dark.png')}
-        style={styles.background}
-        resizeMode='cover'
-      >
-        <SafeAreaView style={{ flex: 1 }}>
-          <Animated.View style={[styles.header, { height: headerHeight }]}>
-            <Animated.View style={{ flexDirection: 'row', opacity: headerOpacity }}>
-              <Ionicons name='person-circle-outline' size={24} color='rgba(239, 242, 239, 1)' />
-              <Text style={styles.greeting}>Hi Amanda!</Text>
-            </Animated.View>
-          </Animated.View>
+    <ImageBackground
+      source={require('./assets/background-dark.png')}
+      style={styles.background}
+      resizeMode='cover'
+    >
+      <Animated.View style={[styles.header, { height: headerHeight }]}>
+        <Animated.View style={{ flexDirection: 'row', opacity: headerOpacity }}>
+          <Ionicons name='person-circle-outline' size={36} color='rgba(239, 242, 239, 1)' />
+          <Text style={styles.greeting}>Hi Amanda!</Text>
+        </Animated.View>
+      </Animated.View>
 
-          <View style={styles.contentContainer}>
-            <View style={styles.searchContainer}>
-              <TextInput
-                style={styles.searchInput}
-                placeholder='Search...'
-                placeholderTextColor='rgba(58, 49, 73, 1)'
-              />
+      <View style={styles.contentContainer}>
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder='Search...'
+            placeholderTextColor='rgba(58, 49, 73, 1)'
+          />
+        </View>
+
+        <Animated.ScrollView
+          style={styles.listContainer}
+          scrollEventThrottle={16}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false }
+          )}
+        >
+          {Array.from({ length: 20 }).map((_, i) => (
+            <View key={i} style={styles.listItem}>
+              <Text>Pokémon #{i + 1}</Text>
             </View>
-
-            <Animated.ScrollView
-              style={styles.listContainer}
-              scrollEventThrottle={16}
-              onScroll={Animated.event(
-                [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-                { useNativeDriver: false }
-              )}
-            >
-              {Array.from({ length: 20 }).map((_, i) => (
-                <View key={i} style={styles.listItem}>
-                  <Text>Pokémon #{i + 1}</Text>
-                </View>
-              ))}
-            </Animated.ScrollView>
-          </View>
-        </SafeAreaView>
-      </ImageBackground>
-    </SafeAreaProvider>
+          ))}
+        </Animated.ScrollView>
+      </View>
+    </ImageBackground>
   )
 }
 
@@ -75,13 +70,15 @@ const styles = StyleSheet.create({
   },
   header: {
     justifyContent: 'flex-start',
-    paddingTop: 20,
+    paddingTop: 60,
     paddingHorizontal: 20,
   },
   greeting: {
     color: 'rgba(239, 242, 239, 1)',
     fontSize: 18,
     marginLeft: 8,
+    fontWeight: 'bold',
+    marginTop: 6,
   },
   contentContainer: {
     flex: 1,
