@@ -1,9 +1,27 @@
-import React from 'react'
-import { StyleSheet, Text, View, ImageBackground, TextInput } from 'react-native'
+import React, { useRef } from 'react'
+import { StyleSheet, Text, View, ImageBackground, TextInput, Animated } from 'react-native'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
+const HEADER_MAX_HEIGHT = 350
+const HEADER_MIN_HEIGHT = 100
+const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT
+
 export default function App() {
+  const scrollY = useRef(new Animated.Value(0)).current
+
+  const headerHeight = scrollY.interpolate({
+    inputRange: [0, HEADER_SCROLL_DISTANCE],
+    outputRange: [HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
+    extrapolate: 'clamp',
+  })
+
+  const headerOpacity = scrollY.interpolate({
+    inputRange: [0, HEADER_SCROLL_DISTANCE / 2, HEADER_SCROLL_DISTANCE],
+    outputRange: [1, 0.5, 0],
+    extrapolate: 'clamp',
+  })
+
   return (
     <SafeAreaProvider>
       <ImageBackground
@@ -12,10 +30,13 @@ export default function App() {
         resizeMode='cover'
       >
         <SafeAreaView style={{ flex: 1 }}>
-          <View style={styles.header}>
-            <Ionicons name='person-circle-outline' size={24} color='white' />
-            <Text style={styles.greeting}>Hi Amanda!</Text>
-          </View>
+          <Animated.View style={[styles.header, { height: headerHeight }]}>
+            <Animated.View style={{ flexDirection: 'row', opacity: headerOpacity }}>
+              <Ionicons name='person-circle-outline' size={24} color='rgba(239, 242, 239, 1)' />
+              <Text style={styles.greeting}>Hi Amanda!</Text>
+            </Animated.View>
+          </Animated.View>
+
           <View style={styles.contentContainer}>
             <View style={styles.searchContainer}>
               <TextInput
@@ -24,6 +45,21 @@ export default function App() {
                 placeholderTextColor='rgba(58, 49, 73, 1)'
               />
             </View>
+
+            <Animated.ScrollView
+              style={styles.listContainer}
+              scrollEventThrottle={16}
+              onScroll={Animated.event(
+                [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                { useNativeDriver: false }
+              )}
+            >
+              {Array.from({ length: 20 }).map((_, i) => (
+                <View key={i} style={styles.listItem}>
+                  <Text>Pokémon #{i + 1}</Text>
+                </View>
+              ))}
+            </Animated.ScrollView>
           </View>
         </SafeAreaView>
       </ImageBackground>
@@ -38,11 +74,9 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   header: {
-    flex: 0.4,
-    flexDirection: 'row',
+    justifyContent: 'flex-start',
     paddingTop: 20,
     paddingHorizontal: 20,
-    justifyContent: 'flex-start',
   },
   greeting: {
     color: 'rgba(239, 242, 239, 1)',
@@ -50,7 +84,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   contentContainer: {
-    flex: 0.6,
+    flex: 1,
     justifyContent: 'flex-start',
     backgroundColor: 'rgba(239, 242, 239, 0.7)',
   },
@@ -75,5 +109,23 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: 'rgba(35, 33, 66, 1)',
+  },
+  listContainer: {
+    paddingHorizontal: 20,
+  },
+  listItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+    backgroundColor: 'rgba(239, 242, 239, 1)',
+    borderRadius: 10,
+    padding: 15,
+    shadowColor: 'rgba(35, 33, 66, 1)',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(35, 33, 66, 1)',
   },
 })
