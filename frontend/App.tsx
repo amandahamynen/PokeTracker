@@ -1,28 +1,33 @@
 import React from 'react'
 import { StyleSheet, Text, View, ImageBackground, TextInput } from 'react-native'
 import Ionicons from '@expo/vector-icons/Ionicons'
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 export default function App() {
   return (
-    <ImageBackground
-      source={require('./assets/background-dark.png')}
-      style={styles.background}
-      resizeMode='cover'
-    >
-      <View style={styles.header}>
-        <Ionicons name='person-circle-outline' size={24} color='white' />
-        <Text style={styles.greeting}>Hi Amanda!</Text>
-      </View>
-      <View style={styles.contentContainer}>
-        <View style={styles.searchContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder='Search...'
-            placeholderTextColor='rgba(58, 49, 73, 1)'
-          />
-        </View>
-      </View>
-    </ImageBackground>
+    <SafeAreaProvider>
+      <ImageBackground
+        source={require('./assets/background-dark.png')}
+        style={styles.background}
+        resizeMode='cover'
+      >
+        <SafeAreaView style={{ flex: 1 }}>
+          <View style={styles.header}>
+            <Ionicons name='person-circle-outline' size={24} color='white' />
+            <Text style={styles.greeting}>Hi Amanda!</Text>
+          </View>
+          <View style={styles.contentContainer}>
+            <View style={styles.searchContainer}>
+              <TextInput
+                style={styles.searchInput}
+                placeholder='Search...'
+                placeholderTextColor='rgba(58, 49, 73, 1)'
+              />
+            </View>
+          </View>
+        </SafeAreaView>
+      </ImageBackground>
+    </SafeAreaProvider>
   )
 }
 
@@ -35,7 +40,7 @@ const styles = StyleSheet.create({
   header: {
     flex: 0.4,
     flexDirection: 'row',
-    paddingTop: 60,
+    paddingTop: 20,
     paddingHorizontal: 20,
     justifyContent: 'flex-start',
   },
